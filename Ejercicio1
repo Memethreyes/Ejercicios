@@ -1,0 +1,56 @@
+import sys
+from datetime import datetime
+
+date_format = "%Y-%m-%d %H:%M:%S"
+dates = [
+    "2024-01-01 15:30:00 a 2024-03-01 15:00:00",  # split ["2024-01-01 15:30:00","2024-03-01 15:00:00"]
+    "2024-02-01 15:15:00 a 2024-05-01 14:45:00",
+    "2023-10-01 13:00:00 a 2023-11-01 13:45:00",
+]
+
+
+# ▰ 2023-10-01 13:00:00 a 2023-11-01 13:45:00
+# ▰ 2024-01-01 15:30:00 a 2024-05-01 14:45:00
+
+
+def remove_overlap(dates_to_check):
+
+    # only_dates = [ d.split(" a ") for d in dates_to_check]
+    input_dates = []
+    for d in dates_to_check:
+        start, end = d.split(" a ")[0], d.split(" a ")[1]
+        input_dates.append(
+            [
+                datetime.strptime(start, date_format).timestamp(),
+                datetime.strptime(end, date_format).timestamp(),
+            ]
+        )
+
+    # TODO order dates
+    print(input_dates)
+    result_dates = []  # adding first date to start comparing
+    for in_d in range(len(input_dates)):  # range of [1,2]
+        # overlaping check
+        if len(result_dates)==0:
+            result_dates.append(input_dates[in_d])
+        else:
+            start_1, end_1 = input_dates[in_d-1][0],input_dates[in_d-1][1]
+            start_2, end_2 = input_dates[in_d][0],input_dates[in_d][1]
+            if start_1 < start_2 and start_2 < end_1:  # overlap
+                print(f"extenign to {end_2}")
+                input_dates[in_d-1][1] = end_2
+            else:
+                result_dates.append(input_dates[in_d])
+    print(result_dates)
+    # generating result
+    result_dates_str=[]
+    for d in result_dates:
+        result_dates_str.append(
+            f"{datetime.fromtimestamp(d[0])} a {datetime.fromtimestamp(d[1])}"
+        )
+    print(result_dates_str)
+    return result_dates_str
+
+if __name__ == "__main__":
+
+    remove_overlap(dates)
